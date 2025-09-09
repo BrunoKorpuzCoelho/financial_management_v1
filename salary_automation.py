@@ -215,11 +215,10 @@ def process_company_rent(company, settings, current_date, monthly_summary, db):
         return
     
     rent_value = settings.rent_value
-    iva_rate = 23.0  # Taxa de IVA de 23% para renda
+    iva_rate = 23.0  
     
-    # Cálculo correto do IVA e valor líquido
-    net_value = round(rent_value / 1.23, 2)  # Valor líquido (sem IVA)
-    iva_value = round(rent_value - net_value, 2)  # Valor do IVA
+    net_value = round(rent_value / 1.23, 2) 
+    iva_value = round(rent_value - net_value, 2)  
     
     new_expense = Expenses(
         transaction_type="despesa",
@@ -234,10 +233,10 @@ def process_company_rent(company, settings, current_date, monthly_summary, db):
     
     db.session.add(new_expense)
     
-    # Atualizar os totais do resumo mensal
+    
     monthly_summary.total_costs += rent_value
     monthly_summary.total_costs_without_vat += net_value
-    monthly_summary.total_vat -= iva_value  # Subtrair IVA (pois é uma despesa)
+    monthly_summary.total_vat -= iva_value  
     
     monthly_summary.profit = monthly_summary.total_sales - monthly_summary.total_costs
     monthly_summary.profit_without_vat = monthly_summary.total_sales_without_vat - monthly_summary.total_costs_without_vat
@@ -310,11 +309,11 @@ def process_company_insurance(company, settings, current_date, monthly_summary, 
     current_month = current_date.month
     current_year = current_date.year
     
-    # CORREÇÃO AQUI: usar a mesma descrição na verificação e na criação
+    
     existing_insurance = Expenses.query.filter(
         and_(
             Expenses.company_id == company.id,
-            Expenses.description == "Seguros da Empresa",  # CORRIGIDO
+            Expenses.description == "Seguros da Empresa",  
             extract('month', Expenses.create_date) == current_month,
             extract('year', Expenses.create_date) == current_year
         )

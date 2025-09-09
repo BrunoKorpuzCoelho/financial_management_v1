@@ -11,7 +11,6 @@ let vatAnalysisChart = null;
 let availableMonths = [];
 let selectedMonths = [];
 let vatMonthlyData = [];
-// Variáveis para o modal de funcionários
 let employeeChart = null;
 let employeeData = [];
 
@@ -756,7 +755,6 @@ function createProfitComparisonChart(revenue, expenses, profit) {
   profitChart = new Chart(ctx, config);
 }
 
-// Função para abrir o modal de detalhes de funcionários
 function openEmployeeDetailsModal() {
   const modal = document.getElementById("employeeDetailsModal");
   modal.style.display = "block";
@@ -765,7 +763,6 @@ function openEmployeeDetailsModal() {
   fetchEmployeeData();
 }
 
-// Função para fechar o modal de funcionários
 function closeEmployeeModal() {
   const modal = document.getElementById("employeeDetailsModal");
   modal.style.display = "none";
@@ -777,7 +774,6 @@ function closeEmployeeModal() {
   }
 }
 
-// Função para buscar os dados dos funcionários
 function fetchEmployeeData() {
   const company_id = getCompanyId();
   
@@ -807,7 +803,6 @@ function fetchEmployeeData() {
     });
 }
 
-// Função para renderizar a tabela de funcionários - CORRIGIDA
 function renderEmployeeTable() {
   const tableBody = document.getElementById("employeeTableBody");
   tableBody.innerHTML = "";
@@ -821,13 +816,10 @@ function renderEmployeeTable() {
   employeeData.forEach(employee => {
     const row = document.createElement("tr");
     
-    // O valor em employee.gross_salary é o custo total para a empresa
     const totalCost = employee.gross_salary;
     
-    // Calcular o salário bruto real
     const grossSalary = totalCost / (1 + employee.employer_social_security_rate / 100);
     
-    // Calcular valores baseados no salário bruto real
     const employeeSS = (grossSalary * employee.social_security_rate) / 100;
     const employerSS = (grossSalary * employee.employer_social_security_rate) / 100;
     const irs = (grossSalary * employee.irs_rate) / 100;
@@ -845,7 +837,6 @@ function renderEmployeeTable() {
     
     tableBody.appendChild(row);
     
-    // Acumular totais
     totalGrossSalary += grossSalary;
     totalEmployeeSS += employeeSS;
     totalEmployerSS += employerSS;
@@ -853,7 +844,6 @@ function renderEmployeeTable() {
     totalNetSalary += netSalary;
   });
   
-  // Atualizar os totais no rodapé da tabela
   document.getElementById("totalGrossSalary").textContent = formatCurrency(totalGrossSalary);
   document.getElementById("totalEmployeeSS").textContent = formatCurrency(totalEmployeeSS);
   document.getElementById("totalEmployerSS").textContent = formatCurrency(totalEmployerSS);
@@ -861,7 +851,6 @@ function renderEmployeeTable() {
   document.getElementById("totalNetSalary").textContent = formatCurrency(totalNetSalary);
 }
 
-// Função para criar o gráfico de comparação entre funcionários - CORRIGIDA
 function createEmployeeChart() {
   const ctx = document.getElementById("employeeComparisonChart").getContext("2d");
   
@@ -869,7 +858,6 @@ function createEmployeeChart() {
     employeeChart.destroy();
   }
   
-  // Preparar os dados para o gráfico com os cálculos corretos
   const labels = employeeData.map(emp => emp.name);
   const grossSalaries = employeeData.map(emp => {
     return emp.gross_salary / (1 + emp.employer_social_security_rate / 100);
@@ -973,16 +961,12 @@ function openVatAnalysisModal() {
   modal.style.display = "block";
   document.body.style.overflow = "hidden";
   
-  // Limpar seleções anteriores
   selectedMonths = [];
   
-  // Preparar os meses disponíveis para seleção
   generateAvailableMonths();
   
-  // Renderizar os checkboxes de seleção de meses
   renderMonthCheckboxes();
   
-  // Resetar a interface para a seleção de meses
   showMonthSelector();
 }
 
@@ -991,7 +975,6 @@ function closeVatModal() {
   modal.style.display = "none";
   document.body.style.overflow = "auto";
   
-  // Destruir o gráfico ao fechar o modal para liberar memória
   if (vatAnalysisChart) {
     vatAnalysisChart.destroy();
     vatAnalysisChart = null;
@@ -1001,21 +984,18 @@ function closeVatModal() {
 function generateAvailableMonths() {
   availableMonths = [];
   
-  // Mês atual
   const currentDate = new Date();
   let year = currentDate.getFullYear();
-  let month = currentDate.getMonth(); // 0-11
+  let month = currentDate.getMonth();
   
-  // Gerar 24 meses (2 anos) para trás
   for (let i = 0; i < 24; i++) {
     availableMonths.push({
-      month: month + 1, // Converter para 1-12
+      month: month + 1,
       year: year,
       label: `${months[month]} ${year}`,
       selected: false
     });
     
-    // Mover para o mês anterior
     if (month === 0) {
       month = 11;
       year--;
@@ -1047,13 +1027,10 @@ function renderMonthCheckboxes() {
 }
 
 function toggleMonthSelection(index) {
-  // Toggle a seleção
   availableMonths[index].selected = !availableMonths[index].selected;
   
-  // Atualizar a lista de meses selecionados
   selectedMonths = availableMonths.filter(month => month.selected);
   
-  // Atualizar a UI
   const checkboxItem = document.querySelector(`.month-checkbox-item[data-index="${index}"]`);
   const checkbox = checkboxItem.querySelector('input[type="checkbox"]');
   
@@ -1075,7 +1052,6 @@ function updateSelectedCount() {
   
   countElement.textContent = `${count} meses selecionados`;
   
-  // Habilitar o botão apenas se o número de meses selecionados estiver entre 3 e 12
   if (count >= 3 && count <= 12) {
     analyzeBtn.disabled = false;
   } else {
@@ -1093,14 +1069,12 @@ function fetchVatData() {
     return;
   }
   
-  // Mostrar indicador de carregamento
   document.getElementById("vatLoadingIndicator").style.display = "flex";
   document.querySelector(".month-selector-section").style.display = "none";
   
   const company_id = getCompanyId();
   vatMonthlyData = [];
   
-  // CORREÇÃO AQUI: Usar financial-summary em vez de simple-financial-summary
   const fetchPromises = selectedMonths.map(monthData => {
     return fetch(`/api/financial-summary?company_id=${company_id}&month=${monthData.month}&year=${monthData.year}`)
       .then(response => response.json())
@@ -1122,13 +1096,10 @@ function fetchVatData() {
       });
   });
   
-  // Processar todas as promessas
   Promise.all(fetchPromises)
     .then(results => {
-      // Filtrar resultados nulos
       vatMonthlyData = results.filter(data => data !== null);
       
-      // Verificar se temos pelo menos um resultado válido
       if (vatMonthlyData.length === 0) {
         alert("Não foram encontrados dados para os meses selecionados.");
         document.getElementById("vatLoadingIndicator").style.display = "none";
@@ -1136,13 +1107,11 @@ function fetchVatData() {
         return;
       }
       
-      // Ordenar por data (do mais recente para o mais antigo)
       vatMonthlyData.sort((a, b) => {
         if (a.year !== b.year) return b.year - a.year;
         return b.month - a.month;
       });
       
-      // Mostrar os resultados
       renderVatResults();
     })
     .catch(error => {
@@ -1193,7 +1162,6 @@ function createVatAnalysisChart() {
     vatAnalysisChart.destroy();
   }
   
-  // Inverter a ordem para que os meses fiquem do mais antigo para o mais recente no gráfico
   const chartData = [...vatMonthlyData].reverse();
   
   vatAnalysisChart = new Chart(ctx, {

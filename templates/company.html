@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="/static/company/css/main.css">
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <div class="header-content">
             <button class="back-btn" aria-label="Voltar">
@@ -21,10 +20,8 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="main-content">
         <div class="container">
-            <!-- Companies List -->
             <div class="companies-grid" id="companiesGrid">
                 {% if companies %}
                     {% for company in companies %}
@@ -56,7 +53,6 @@
                 {% endif %}
             </div>
 
-            <!-- Add New Company Button -->
             <button class="add-company-btn" id="addCompanyBtn">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -66,7 +62,6 @@
         </div>
     </main>
 
-    <!-- Modal -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
             <div class="modal-header">

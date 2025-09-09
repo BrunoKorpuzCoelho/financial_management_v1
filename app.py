@@ -131,7 +131,6 @@ def add_expense():
             flash('❌ Por favor, preencha todos os campos corretamente.', 'error')
             return redirect(url_for('expenses', company_id=company_id))
         
-        # Adicionar nova transação à tabela Expenses
         new_expense = Expenses(
             transaction_type=transaction_type,
             description=description,
@@ -185,13 +184,12 @@ def update_monthly_summary(expense):
                 total_sales_without_vat=0.0,
                 total_vat=0.0,
                 total_costs=0.0,
-                total_costs_without_vat=0.0,  # Inicializa explicitamente como 0.0
+                total_costs_without_vat=0.0,  
                 profit=0.0,
                 profit_without_vat=0.0
             )
             db.session.add(summary)
         
-        # Garantir que todos os campos numéricos são inicializados
         if summary.total_costs_without_vat is None:
             summary.total_costs_without_vat = 0.0
         if summary.total_sales_without_vat is None:
@@ -208,7 +206,6 @@ def update_monthly_summary(expense):
             summary.total_costs_without_vat += expense.net_value
             summary.total_vat -= expense.iva_value
         
-        # Atualizar cálculos de lucro
         summary.profit = summary.total_sales - summary.total_costs
         summary.profit_without_vat = summary.total_sales_without_vat - summary.total_costs_without_vat
         
@@ -272,7 +269,6 @@ def remove_from_monthly_summary(date, company_id, transaction_type, gross_value,
         ).first()
         
         if summary:
-            # Garantir que todos os campos numéricos são inicializados
             if summary.total_costs_without_vat is None:
                 summary.total_costs_without_vat = 0.0
             if summary.total_sales_without_vat is None:
@@ -398,7 +394,7 @@ def adjust_monthly_summary(expense, old_type, old_gross, old_net, old_iva):
                 total_sales_without_vat=0.0,
                 total_vat=0.0,
                 total_costs=0.0,
-                total_costs_without_vat=0.0,  # Inicializa explicitamente como 0.0
+                total_costs_without_vat=0.0,
                 profit=0.0,
                 profit_without_vat=0.0
             )
@@ -413,13 +409,11 @@ def adjust_monthly_summary(expense, old_type, old_gross, old_net, old_iva):
                 summary.total_costs_without_vat += expense.net_value
                 summary.total_vat -= expense.iva_value  
         else:
-            # Garantir que todos os campos numéricos são inicializados
             if summary.total_costs_without_vat is None:
                 summary.total_costs_without_vat = 0.0
             if summary.total_sales_without_vat is None:
                 summary.total_sales_without_vat = 0.0
                 
-            # Remover os valores antigos
             if old_type.lower() == 'ganho':
                 summary.total_sales -= old_gross
                 summary.total_sales_without_vat -= old_net
@@ -1789,4 +1783,4 @@ if __name__ == '__main__':
         
         install_core()
         start_day_checker(app)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=4000)
