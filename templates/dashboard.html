@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão Financeira</title>
+    <link rel="stylesheet" href="/static/dashboard/css/main.css">
+    <script>
+        var companyId = "{{ company_id }}";
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <button class="back-btn" onclick="goBack()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+                </button>
+            <div class="btn-container">
+                <button class="logout-btn" onclick="handleSettings()">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="m22.676,16.014c-.178-.644-.597-1.18-1.177-1.509l-.749-.423c.166-.692.25-1.391.25-2.082s-.084-1.39-.25-2.082l.748-.424c1.199-.68,1.623-2.208.943-3.406-.329-.582-.864-1-1.508-1.179-.643-.175-1.318-.095-1.899.234l-.751.426c-1.064-1.041-2.359-1.796-3.784-2.208v-.861c0-1.379-1.122-2.5-2.5-2.5s-2.5,1.121-2.5,2.5v.861c-1.425.412-2.72,1.167-3.784,2.208l-.75-.425c-.581-.33-1.254-.41-1.899-.235-.644.179-1.179.597-1.508,1.179-.679,1.198-.256,2.727.943,3.406l.748.424c-.166.692-.25,1.391-.25,2.082s.084,1.39.25,2.082l-.748.423c-.581.329-1,.865-1.178,1.509-.178.644-.095,1.317.234,1.898.329.582.864,1,1.508,1.179.644.176,1.317.096,1.899-.234l.751-.426c1.064,1.041,2.359,1.796,3.784,2.208v.861c0,1.379,1.122,2.5,2.5,2.5s2.5-1.121,2.5-2.5v-.861c1.425-.412,2.72-1.167,3.784-2.208l.75.425c.582.331,1.255.412,1.899.235.644-.179,1.179-.597,1.508-1.179.329-.581.412-1.255.234-1.898Zm-1.104,1.406c-.197.349-.519.6-.905.707-.386.105-.791.057-1.14-.142l-1.085-.614c-.199-.11-.452-.074-.611.094-1.07,1.141-2.435,1.937-3.949,2.303-.224.055-.382.256-.382.486v1.246c0,.827-.673,1.5-1.5,1.5s-1.5-.673-1.5-1.5v-1.246c0-.23-.158-.432-.382-.486-1.514-.366-2.879-1.162-3.949-2.303-.097-.104-.23-.158-.365-.158-.084,0-.169.021-.246.064l-1.086.615c-.349.197-.753.246-1.139.141-.386-.107-.708-.358-.905-.707-.407-.72-.153-1.637.566-2.044l1.083-.613c.201-.114.297-.351.234-.572-.207-.728-.312-1.464-.312-2.19s.105-1.463.312-2.19c.063-.222-.034-.458-.234-.571l-1.083-.613c-.72-.408-.974-1.325-.566-2.045.197-.349.519-.6.905-.707.386-.105.791-.057,1.14.142l1.085.614c.201.112.454.075.611-.094,1.069-1.141,2.435-1.937,3.949-2.303.224-.055.382-.256.382-.486v-1.246c0-.827.673-1.5,1.5-1.5s1.5.673,1.5,1.5v1.246c0,.23.158.432.382.486,1.514.366,2.879,1.162,3.949,2.303.158.168.411.204.611.094l1.086-.615c.349-.197.753-.246,1.139-.141.386.107.708.358.905.707.408.72.153,1.637-.566,2.045l-1.083.613c-.201.113-.297.35-.234.571.207.728.312,1.464.312,2.19s-.105,1.463-.312,2.19c-.063.222.034.458.234.572l1.083.613c.348.197.599.519.706.904s.057.791-.141,1.14Zm-13.065-5.349l-.007-4.572c0-.275-.224-.499-.5-.499h0c-.276,0-.5.225-.499.501l.007,4.57c-.86.224-1.499,1-1.499,1.929s.638,1.703,1.497,1.928l-.004.568c-.002.276.22.502.496.504h.004c.274,0,.498-.222.5-.496l.004-.574c.862-.223,1.503-1,1.503-1.93s-.64-1.706-1.501-1.929Zm-.499,2.929c-.551,0-1-.448-1-1s.449-1,1-1,1,.448,1,1-.449,1-1,1Zm8.499-2.929l-.007-4.572c0-.275-.224-.499-.5-.499h0c-.276,0-.5.225-.499.501l.007,4.57c-.86.224-1.499,1-1.499,1.929s.638,1.703,1.497,1.928l-.004.568c-.002.276.22.502.496.504h.004c.274,0,.498-.222.5-.496l.004-.574c.862-.223,1.503-1,1.503-1.93s-.64-1.706-1.501-1.929Zm-.499,2.929c-.551,0-1-.448-1-1s.449-1,1-1,1,.448,1,1-.449,1-1,1Zm-3.503-6.93l-.004-.574c-.002-.274-.226-.496-.5-.496h-.004c-.276.002-.498.228-.496.504l.004.568c-.859.225-1.497,1-1.497,1.928s.639,1.705,1.499,1.929l-.007,4.57c0,.276.223.501.499.501h0c.276,0,.5-.224.5-.499l.007-4.572c.861-.223,1.501-1,1.501-1.929s-.641-1.707-1.503-1.93Zm-.497,2.93c-.551,0-1-.448-1-1s.449-1,1-1,1,.448,1,1-.449,1-1,1Z"/>
+                    </svg>
+                </button>
+                <button class="logout-btn" onclick="handleLogout()">
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    Sair
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="cards-grid">
+            <div class="card card-emerald" onclick="handleCardClick('adicionar-transacao')">
+                <div class="icon-container">
+                    <svg class="icon icon-emerald" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="card-title">Adicionar Registo</h2>
+                    <p class="card-description">Para registar novos ganhos ou despesas</p>
+                </div>
+            </div>
+
+            <div class="card card-blue" onclick="handleCardClick('despesas-mensais')">
+                <div class="icon-container">
+                    <svg class="icon icon-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="card-title">Dashboard</h2>
+                    <p class="card-description">Para visualizar as despesas</p>
+                </div>
+            </div>
+
+            <div class="card card-purple" onclick="handleCardClick('configurar-orcamento')">
+                <div class="icon-container">
+                    <svg class="icon icon-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="card-title">Empregados</h2>
+                    <p class="card-description">Para configurar os Empregados e seus custos</p>
+                </div>
+            </div>
+
+            <div class="card card-orange" onclick="handleCardClick('historico-transacoes')">
+                <div class="icon-container">
+                    <svg class="icon icon-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="card-title">Registos Simples</h2>
+                    <p class="card-description">Registos simples de vendas e despesas</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="system-modal" class="system-modal">
+    <div class="system-modal-content">
+        <div class="system-modal-header">
+            <button class="system-modal-close" onclick="closeSystemModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="system-modal-body" id="system-modal-body">
+            <!-- Conteúdo dinâmico do modal será inserido aqui -->
+        </div>
+    </div>
+</div>
+    
+    <script src="/static/dashboard/js/main.js"></script>
+    <script src="/static/dashboard/js/modal_js_addition.js"></script>
+</body>
+</html>

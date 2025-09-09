@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Empregados</title>
+    <link rel="stylesheet" href="/static/employee/css/main.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+                </button>
+                <div class="header-content">
+                    <button class="logout-btn" onclick="handleLogout()">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        Sair
+                    </button>
+                </div>  
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Desktop Table -->
+            <div class="table-container desktop-only">
+                <table class="employees-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Cargo</th>
+                            <th>Salário Mensal</th>
+                            <th>SS Empregado</th>
+                            <th>SS Empregador</th>
+                            <th>IRS</th>
+                            <th>Pagamento Extra</th>
+                            <th>Ativo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeesTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mobile-cards mobile-only" id="mobileCards">
+            </div>
+
+            <div class="pagination" id="pagination" style="display: none;">
+                <button class="btn-ghost" id="prevBtn" disabled>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+                    Anterior
+                </button>
+                
+                <div class="page-numbers" id="pageNumbers">
+                </div>
+                
+                <button class="btn-ghost" id="nextBtn">
+                    Próximo
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <p>Nenhum empregado registado</p>
+                <p class="empty-subtitle">Adicione o primeiro empregado</p>
+            </div>
+        </main>
+
+        <button class="floating-btn" id="addEmployeeBtn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14m-7-7h14"/>
+            </svg>
+        </button>
+
+        <div class="modal-overlay" id="modalOverlay" style="display: none;">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Adicionar Novo Empregado</h2>
+                </div>
+                
+                <form id="employeeForm" action="/add-employee" method="POST">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="employeeName">Nome Completo *</label>
+                            <input type="text" id="employeeName" name="employeeName" placeholder="Digite o nome completo" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="employeePosition">Cargo/Função *</label>
+                            <input type="text" id="employeePosition" name="employeePosition" placeholder="Ex: Gerente, Vendedor, Técnico" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="employeeSalary">Salário Mensal (€) *</label>
+                            <input type="number" id="employeeSalary" name="employeeSalary" placeholder="0.00" step="0.01" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="employeeSocialSecurity">Taxa de Segurança Social - Empregado (%) *</label>
+                            <input type="number" id="employeeSocialSecurity" name="employeeSocialSecurity" placeholder="0.00" step="0.01" value="11.00" required>
+                            <small class="input-help">Valor padrão: 11%</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="employerSocialSecurity">Taxa de Segurança Social - Empregador (%) *</label>
+                            <input type="number" id="employerSocialSecurity" name="employerSocialSecurity" placeholder="0.00" step="0.01" value="23.75" required>
+                            <small class="input-help">Valor padrão: 23.75%</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="employeeIRS">Taxa de IRS (%)</label>
+                            <input type="number" id="employeeIRS" name="employeeIRS" placeholder="0.00" step="0.01" value="0.00">
+                            <small class="input-help">Deixe 0 se não aplicável</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="extraPayment">Pagamento Extra (€)</label>
+                            <input type="number" id="extraPayment" name="extraPayment" placeholder="0.00" step="0.01" value="0.00" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="extraPaymentDescription">Descrição do Pagamento Extra</label>
+                            <input type="text" id="extraPaymentDescription" name="extraPaymentDescription" placeholder="Ex: Subsídio de alimentação" readonly>
+                        </div>
+                        
+                        <input type="hidden" id="employeeId" name="employeeId">
+                        <input type="hidden" id="companyIdInput" name="company_id" value="{{ company_id }}">
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn-outline" id="cancelBtn">Cancelar</button>
+                        <button type="submit" class="btn-primary">Adicionar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="toast" id="toast" style="display: none;">
+            <div class="toast-content">
+                <span id="toastMessage"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/employee/js/main.js"></script>
+</body>
+</html>

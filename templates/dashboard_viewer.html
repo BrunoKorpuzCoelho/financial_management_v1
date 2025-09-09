@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Financeiro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/dashboard_viewer/css/main.css">
+</head>
+<body>
+    <header class="header">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+                </button>
+                <div class="header-content">
+                    <button class="logout-btn" onclick="handleLogout()">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        Sair
+                    </button>
+                </div>  
+        </header>
+
+    <main class="main-content">
+        <div class="month-selector">
+            <button class="month-btn" id="prevMonth">‹</button>
+            <h2 class="current-month" id="currentMonth">Janeiro 2024</h2>
+            <button class="month-btn" id="nextMonth">›</button>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-card revenue clickable" onclick="openTransactionsModal('ganho', 'Total de Vendas')">
+                <div class="card-icon">💰</div>
+                <div class="card-content">
+                    <h3>Total de Vendas</h3>
+                    <p class="card-value" id="revenue-value">€0</p>
+                    <span class="card-change" id="revenue-change">0%</span>
+                </div>
+            </div>
+
+            <div class="summary-card vat clickable" onclick="openVatAnalysisModal()">
+                <div class="card-icon">🧾</div>
+                <div class="card-content">
+                    <h3>Total de IVA</h3>
+                    <p class="card-value" id="vat-value">€0</p>
+                    <span class="card-change" id="vat-change">0%</span>
+                </div>
+            </div>
+
+             <div class="summary-card expenses clickable" onclick="openTransactionsModal('despesa', 'Despesas')">
+                <div class="card-icon">💸</div>
+                <div class="card-content">
+                    <h3>Despesas</h3>
+                    <p class="card-value" id="expenses-value">€0</p>
+                    <span class="card-change" id="expenses-change">0%</span>
+                </div>
+            </div>
+
+            <div class="summary-card profit clickable" onclick="openProfitDetailsModal()">
+                <div class="card-icon">📈</div>
+                <div class="card-content">
+                    <h3>Lucro Líquido</h3>
+                    <p class="card-value" id="profit-value">€0</p>
+                    <span class="card-change" id="profit-change">0%</span>
+                </div>
+            </div>
+
+            <div class="summary-card collaborators clickable" onclick="openEmployeeDetailsModal()">
+                <div class="card-icon">👥</div>
+                <div class="card-content">
+                    <h3>Custos Colaboradores</h3>
+                    <p class="card-value" id="collaborators-value">€0</p>
+                    <span class="card-change" id="collaborators-change">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="charts-header">
+                <h3>Análise Visual</h3>
+                <div class="chart-selector">
+                    <select id="chartType">
+                        <option value="bar">Gráfico de Barras</option>
+                        <option value="line">Performance Financeira</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="mainChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <div id="transactionsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Detalhes das Transações</h2>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="table-container">
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th>Valor Bruto</th>
+                                <th>IVA %</th>
+                                <th>Valor IVA</th>
+                                <th>Valor Líquido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="paginationContainer" class="pagination">
+                    <button id="prevPage" class="page-btn">« Anterior</button>
+                    <div id="pageNumbers" class="page-numbers"></div>
+                    <button id="nextPage" class="page-btn">Próximo »</button>
+                </div>
+                <div id="noTransactionsMessage" class="no-data-message" style="display: none;">
+                    Nenhuma transação encontrada para este período.
+                </div>
+                <div id="loadingIndicator" class="loading-indicator">
+                    <div class="spinner"></div>
+                    <p>Carregando transações...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="profitDetailsModal" class="modal">
+        <div class="modal-content profit-details-modal">
+            <div class="modal-header">
+                <h2 id="profitModalTitle">Detalhamento do Lucro</h2>
+                <span class="close-btn" onclick="closeProfitModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="profit-summary-container">
+                    <h3>Resumo do Período</h3>
+                    <div class="profit-summary-card">
+                        <div class="profit-calculation">
+                            <div class="calculation-line">
+                                <span class="calc-label">Receitas Totais</span>
+                                <span class="calc-value positive" id="modal-total-revenue">€0</span>
+                            </div>
+                            <div class="calculation-line">
+                                <span class="calc-label">Despesas Totais</span>
+                                <span class="calc-value negative" id="modal-total-expenses">€0</span>
+                            </div>
+                            <div class="calculation-divider"></div>
+                            <div class="calculation-line result">
+                                <span class="calc-label">Lucro Líquido</span>
+                                <span class="calc-value" id="modal-total-profit">€0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profit-details">
+                    <div class="profit-section revenue-section">
+                        <h3>Detalhamento das Receitas</h3>
+                        <div class="details-card">
+                            <div class="detail-item">
+                                <span>Vendas Brutas</span>
+                                <span id="modal-gross-sales">€0</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Total IVA</span>
+                                <span id="modal-total-vat">€0</span>
+                            </div>
+                            <div class="detail-item result">
+                                <span>Receitas Líquidas</span>
+                                <span id="modal-net-sales">€0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profit-section expenses-section">
+                        <h3>Detalhamento das Despesas</h3>
+                        <div class="details-card">
+                            <div class="detail-item">
+                                <span>Despesas Operacionais</span>
+                                <span id="modal-operational-expenses">€0</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Custos com Funcionários</span>
+                                <span id="modal-employee-expenses">€0</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Seguros</span>
+                                <span id="modal-insurance-expenses">€0</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Renda</span>
+                                <span id="modal-rent-expenses">€0</span>
+                            </div>
+                            <div class="detail-item result">
+                                <span>Total Despesas</span>
+                                <span id="modal-expenses-total">€0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profit-visual">
+                    <h3>Comparação Visual</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="profitComparisonChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="vatAnalysisModal" class="modal">
+        <div class="modal-content vat-analysis-modal">
+            <div class="modal-header">
+                <h2>Análise de IVA</h2>
+                <span class="close-btn" onclick="closeVatModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="month-selector-section">
+                    <h3>Selecione os meses para análise</h3>
+                    <p class="selector-info">Selecione de 3 a 12 meses para analisar o IVA</p>
+                    <div class="month-checkboxes" id="monthCheckboxes">
+                    </div>
+                    <div class="selection-controls">
+                        <span id="selectedCount">0 meses selecionados</span>
+                        <button id="analyzeVatBtn" class="analyze-btn" disabled>Analisar</button>
+                    </div>
+                </div>
+                
+                <div class="vat-results-section" id="vatResultsSection" style="display: none;">
+                    <h3>Resultados da Análise</h3>
+                    <div class="table-container">
+                        <table class="vat-results-table">
+                            <thead>
+                                <tr>
+                                    <th>Mês</th>
+                                    <th>Valor de IVA</th>
+                                    <th>Vendas Totais</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vatResultsTableBody">
+                            </tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td>Total</td>
+                                    <td id="totalVatValue">€0</td>
+                                    <td id="totalSalesValue">€0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    <div class="vat-chart-section">
+                        <h3>Análise Gráfica</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="vatAnalysisChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <button class="back-to-selection-btn" onclick="showMonthSelector()">Voltar para seleção</button>
+                </div>
+                
+                <div id="vatLoadingIndicator" class="loading-indicator" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Carregando dados de IVA...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="employeeDetailsModal" class="modal">
+        <div class="modal-content employee-details-modal">
+            <div class="modal-header">
+                <h2>Detalhes dos Colaboradores</h2>
+                <span class="close-btn" onclick="closeEmployeeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="table-container">
+                    <table class="employee-results-table">
+                        <thead>
+                            <tr>
+                                <th>Colaborador</th>
+                                <th>Cargo</th>
+                                <th>Salário Bruto</th>
+                                <th>SS Empregado</th>
+                                <th>SS Empregador</th>
+                                <th>IRS</th>
+                                <th>Salário Líquido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeTableBody">
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td colspan="2">Total</td>
+                                <td id="totalGrossSalary">€0</td>
+                                <td id="totalEmployeeSS">€0</td>
+                                <td id="totalEmployerSS">€0</td>
+                                <td id="totalIRS">€0</td>
+                                <td id="totalNetSalary">€0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                
+                <div class="employee-chart-section">
+                    <h3>Comparativo por Colaborador</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="employeeComparisonChart"></canvas>
+                    </div>
+                </div>
+                
+                <div id="employeeLoadingIndicator" class="loading-indicator" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Carregando dados dos colaboradores...</p>
+                </div>
+                
+                <div id="noEmployeesMessage" class="no-data-message" style="display: none;">
+                    Nenhum colaborador encontrado para esta empresa.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/dashboard_viewer/js/main.js"></script>
+</body>
+</html>

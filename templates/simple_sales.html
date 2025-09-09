@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Vendas Simples</title>
+    <link rel="stylesheet" href="/static/expenses/css/main.css">
+    <link rel="stylesheet" href="/static/simple_sales/css/main.css">
+</head>
+<body data-user-type="{{ user_type }}">
+    <header class="header">
+        <button class="back-btn" onclick="goBack()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="m15 18-6-6 6-6"/>
+            </svg>
+        </button>
+        <div class="header-content">
+            <div class="month-selector">
+                <select id="month-select" class="month-select">
+                    <option value="1">Janeiro</option>
+                    <option value="2">Fevereiro</option>
+                    <option value="3">Março</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Maio</option>
+                    <option value="6">Junho</option>
+                    <option value="7">Julho</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Setembro</option>
+                    <option value="10">Outubro</option>
+                    <option value="11">Novembro</option>
+                    <option value="12">Dezembro</option>
+                </select>
+                <select id="year-select" class="year-select">
+                    <!-- Years will be populated by JavaScript -->
+                </select>
+                <button id="filter-btn" class="filter-btn">Filtrar</button>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                Sair
+            </button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card revenue">
+                <div class="card-icon">💰</div>
+                <div class="card-content">
+                    <h3>Total de Vendas</h3>
+                    <p class="card-value" id="revenue-value">€0</p>
+                    <span class="card-change" id="revenue-change">0%</span>
+                </div>
+            </div>
+            
+            <div class="summary-card expenses">
+                <div class="card-icon">💸</div>
+                <div class="card-content">
+                    <h3>Despesas</h3>
+                    <p class="card-value" id="expenses-value">€0</p>
+                    <span class="card-change" id="expenses-change">0%</span>
+                </div>
+            </div>
+            
+            <div class="summary-card vat">
+                <div class="card-icon">🧾</div>
+                <div class="card-content">
+                    <h3>Total de IVA</h3>
+                    <p class="card-value" id="vat-value">€0</p>
+                    <span class="card-change" id="vat-change">0%</span>
+                </div>
+            </div>
+            
+            <div class="summary-card profit">
+                <div class="card-icon">📈</div>
+                <div class="card-content">
+                    <h3>Lucro Líquido</h3>
+                    <p class="card-value" id="profit-value">€0</p>
+                    <span class="card-change" id="profit-change">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                            <th>Valor Bruto</th>
+                            <th>IVA %</th>
+                            <th>Valor IVA</th>
+                            <th>Valor Líquido</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactions-tbody">
+                        {% if expenses %}
+                            {% for expense in expenses %}
+                                <tr data-id="{{ expense.id }}">
+                                    <td>
+                                        <span class="type-badge type-{{ expense.transaction_type }}">
+                                            {% if expense.transaction_type == 'ganho' %}
+                                                Ganho
+                                            {% else %}
+                                                Despesa
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td>{{ expense.description }}</td>
+                                    <td>{{ "%.2f €"|format(expense.gross_value) }}</td>
+                                    <td>{{ "%.0f"|format(expense.iva_rate) }}%</td>
+                                    <td>{{ "%.2f €"|format(expense.iva_value) }}</td>
+                                    <td>{{ "%.2f €"|format(expense.net_value) }}</td>
+                                    <td>
+                                        <button class="edit-btn" onclick="editTransaction('{{ expense.id }}')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                        </button>
+                                        <button class="delete-btn" onclick="deleteTransaction('{{ expense.id }}')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="3,6 5,6 21,6"></polyline>
+                                                <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                {% if pagination.has_prev %}
+                    <a href="{{ url_for('simple_sales', company_id=company_id, page=pagination.prev_num, month=request.args.get('month'), year=request.args.get('year')) }}" class="pagination-btn">&laquo; Anterior</a>
+                {% else %}
+                    <span class="pagination-btn disabled">&laquo; Anterior</span>
+                {% endif %}
+
+                {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        {% if pagination.page == page_num %}
+                            <span class="pagination-btn active">{{ page_num }}</span>
+                        {% else %}
+                            <a href="{{ url_for('simple_sales', company_id=company_id, page=page_num, month=request.args.get('month'), year=request.args.get('year')) }}" class="pagination-btn">{{ page_num }}</a>
+                        {% endif %}
+                    {% else %}
+                        <span class="pagination-ellipsis">…</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if pagination.has_next %}
+                    <a href="{{ url_for('simple_sales', company_id=company_id, page=pagination.next_num, month=request.args.get('month'), year=request.args.get('year')) }}" class="pagination-btn">Próximo &raquo;</a>
+                {% else %}
+                    <span class="pagination-btn disabled">Próximo &raquo;</span>
+                {% endif %}
+            </div>
+            
+            <div id="empty-state" class="empty-state">
+                <div class="empty-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                </div>
+                <h3>Nenhuma transação encontrada</h3>
+                <p>Adicione a sua primeira transação clicando no botão abaixo</p>
+            </div>
+        </div>
+    </main>
+
+    <button class="fab" onclick="openModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+    </button>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Adicionar Transação</h2>
+                <button class="close-btn" onclick="closeModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="transaction-form" class="modal-form" action="/add-simple-expenses" method="POST">
+                <div class="form-group">
+                    <label for="type">Tipo de Transação</label>
+                    <select name="transaction_type" id="type" required>
+                        <option value="">Selecione o tipo</option>
+                        <option value="ganho">Ganho</option>
+                        <option value="despesa">Despesa</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Descrição</label>
+                    <input type="text" name="description" id="description" placeholder="Descrição da transação" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="gross-value">Valor Bruto (€)</label>
+                    <input type="number" name="gross_value" id="gross-value" step="0.01" min="0" placeholder="0.00" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="iva-rate">Taxa de IVA (%)</label>
+                    <select name="iva_rate" id="iva-rate">
+                        <option value="0">0% (Isento)</option>
+                        <option value="6">6% (Taxa reduzida)</option>
+                        <option value="13">13% (Taxa intermédia)</option>
+                        <option value="23" selected>23% (Taxa normal)</option>
+                    </select>
+                </div>
+
+                <div class="calculated-values">
+                    <div class="calc-row">
+                        <span>Valor IVA:</span>
+                        <span id="iva-value">€0.00</span>
+                    </div>
+                    <div class="calc-row">
+                        <span>Valor Líquido:</span>
+                        <span id="net-value">€0.00</span>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn-primary">Adicionar</button>
+                </div>
+                <input type="hidden" name="company_id" value="{{ company_id }}">
+                <input type="hidden" name="iva_value" id="iva-value-input">
+                <input type="hidden" name="net_value" id="net-value-input">
+                <input type="hidden" name="expense_id" id="expense-id-input">
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/simple_sales/js/main.js"></script>
+</body>
+</html>

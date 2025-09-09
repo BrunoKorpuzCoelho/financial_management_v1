@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Empresas - Gestão Financeira</title>
+    <link rel="stylesheet" href="/static/company/css/main.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <button class="back-btn" aria-label="Voltar">
+            </button>
+            <button class="logout-btn" onclick="handleLogout()">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                Sair
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Companies List -->
+            <div class="companies-grid" id="companiesGrid">
+                {% if companies %}
+                    {% for company in companies %}
+                        <div class="company-card" data-company="{{ company.id }}">
+                            <div class="company-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="company-info" onclick="selectCompany(this.parentElement)">
+                                <h3 class="company-name">{{ company.name }}</h3>
+                                <p class="company-description">NIF: {{ company.tax_id }} • {{ company.location }}</p>
+                            </div>
+                            <button class="edit-btn" onclick="editCompany(event, '{{ company.id }}')">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>Nenhuma empresa encontrada</p>
+                        <p>Clique no botão abaixo para adicionar sua primeira empresa</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Add New Company Button -->
+            <button class="add-company-btn" id="addCompanyBtn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Adicionar Nova Empresa</span>
+            </button>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Nova Empresa</h2>
+                <button class="modal-close" id="modalClose" aria-label="Fechar">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <form class="modal-form" id="companyForm" action="/add-company" method="POST">
+                <div class="form-group">
+                    <label for="companyName" class="form-label">Nome da Empresa *</label>
+                    <input type="text" id="companyName" name="name" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="companyNif" class="form-label">NIF</label>
+                    <input type="text" id="companyNif" name="tax_id" class="form-input" placeholder="123456789">
+                </div>
+                
+                <div class="form-group">
+                    <label for="companyLocation" class="form-label">Localização</label>
+                    <input type="text" id="companyLocation" name="location" class="form-input"  placeholder="Ex: Lisboa, Portugal">
+                </div>
+                
+                <div class="form-group">
+                    <label for="companyType" class="form-label">Tipo de Relação</label>
+                    <select id="companyType" name="relationship_type" class="form-input">
+                        <option value="">Selecione o tipo</option>
+                        <option value="própria">Própria</option>
+                        <option value="parceria">Parceria</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="companyPhone" class="form-label">Telefone</label>
+                    <input type="tel" id="companyPhone" name="phone" class="form-input" placeholder="Ex: +351 912345678">
+                </div>
+                
+                <div class="form-group">
+                    <label for="companyEmail" class="form-label">Email</label>
+                    <input type="email" id="companyEmail" name="email" class="form-input" placeholder="exemplo@empresa.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="companyNotes" class="form-label">Observações</label>
+                    <textarea id="companyNotes" name="notes" class="form-input" rows="3" placeholder="Informações adicionais sobre a empresa"></textarea>
+                </div>
+                
+                <input type="hidden" id="companyId" name="company_id" value="">
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelBtn">Cancelar</button>
+                    <button type="submit" class="btn-primary">Criar Empresa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/company/js/main.js"></script>
+</body>
+</html>

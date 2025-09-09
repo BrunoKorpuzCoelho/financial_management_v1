@@ -1,0 +1,868 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f8fafc;
+    color: #1e293b;
+    line-height: 1.6;
+}
+
+/* Navigation */
+.navbar {
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.nav-menu {
+    display: none;
+    gap: 2rem;
+}
+
+.nav-item {
+    color: #64748b;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.nav-item:hover {
+    color: #1e293b;
+}
+
+/* Main Content */
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Month Selector */
+.month-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.month-btn {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: all 0.2s;
+}
+
+.month-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.current-month {
+    font-size: 1.5rem;
+    font-weight: 600;
+    min-width: 200px;
+    text-align: center;
+}
+
+/* Summary Cards */
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s;
+}
+
+.summary-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Adicionando estilo para cards clicáveis */
+.clickable {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.clickable::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.clickable:hover::after {
+    opacity: 1;
+}
+
+.clickable:active {
+    transform: translateY(0);
+}
+
+.card-icon {
+    font-size: 2rem;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+}
+
+.revenue .card-icon { background: #dcfce7; }
+.expenses .card-icon { background: #fef3c7; }
+.profit .card-icon { background: #dbeafe; }
+.collaborators .card-icon { background: #f3e8ff; }
+.vat .card-icon { background: #fae8ff; }
+
+.card-content h3 {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 0.25rem;
+}
+
+.card-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.card-change {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.positive { color: #16a34a; }
+.negative { color: #dc2626; }
+.neutral { color: #64748b; }
+
+/* Charts Section */
+.charts-section {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.charts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.charts-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.chart-selector select {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+}
+
+.chart-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 5;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow: auto;
+}
+
+.modal-content {
+    background: white;
+    margin: 2% auto;
+    width: 90%;
+    max-width: 1000px;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: modalFadeIn 0.3s;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.close-btn {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #64748b;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #1e293b;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+/* Tabela de transações */
+.table-container {
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+}
+
+.transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.transactions-table th, 
+.transactions-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.transactions-table th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.transactions-table tr:hover {
+    background-color: #f1f5f9;
+}
+
+.transactions-table .despesa-row {
+    background-color: #FEF2F2;
+}
+
+.transactions-table .ganho-row {
+    background-color: #F0FDF4;
+}
+
+.table-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.badge-despesa {
+    background-color: #FEE2E2;
+    color: #B91C1C;
+}
+
+.badge-ganho {
+    background-color: #DCFCE7;
+    color: #15803D;
+}
+
+/* Paginação */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.page-btn {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.page-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #1e293b;
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-numbers {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.page-number {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.375rem;
+    min-width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.page-number:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.page-number.active {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+    font-weight: 500;
+}
+
+.no-data-message {
+    text-align: center;
+    padding: 2rem 0;
+    color: #64748b;
+    font-style: italic;
+}
+
+.loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+}
+
+.loading-indicator p {
+    margin-top: 0.75rem;
+    color: #64748b;
+}
+
+/* Action buttons */
+.action-btn {
+    background: transparent;
+    border: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.375rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #64748b;
+}
+
+.action-btn:hover {
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
+
+.edit-btn:hover {
+    color: #3b82f6;
+}
+
+.delete-btn:hover {
+    color: #ef4444;
+}
+
+/* Responsive */
+@media (min-width: 640px) {
+    .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .nav-menu {
+        display: flex;
+    }
+
+    .month-checkboxes {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    
+    .vat-results-table {
+        font-size: 0.875rem;
+    }
+    
+    .vat-results-table th, 
+    .vat-results-table td {
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .summary-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .chart-container {
+        height: 400px;
+    }
+    
+    .main-content {
+        padding: 3rem 2rem;
+    }
+}
+
+.header {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4b5563;
+    background: none;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.logout-btn:hover {
+    color: #111827;
+    background-color: #f3f4f6;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.back-btn:hover {
+  background-color: #f1f5f9;
+}
+
+.icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.profit-details-modal {
+    max-width: 480px;
+}
+
+.profit-summary-container {
+    margin-bottom: 1.5rem;
+}
+
+.profit-summary-container h3, 
+.profit-section h3,
+.profit-visual h3 {
+    font-size: 1rem;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.profit-summary-card {
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.profit-calculation {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.calculation-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+}
+
+.calculation-line.result {
+    font-weight: 700;
+    font-size: 1.125rem;
+    margin-top: 0.25rem;
+}
+
+.calculation-divider {
+    border-top: 1px solid #e2e8f0;
+    margin: 0.5rem 0;
+}
+
+.calc-label {
+    color: #64748b;
+}
+
+.calc-value {
+    font-weight: 600;
+}
+
+.calc-value.positive {
+    color: #16a34a;
+}
+
+.calc-value.negative {
+    color: #dc2626;
+}
+
+.profit-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.profit-section {
+    width: 100%;
+}
+
+.details-card {
+    background-color: #f8fafc;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    font-size: 0.875rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-item.result {
+    font-weight: 600;
+    padding-top: 0.75rem;
+}
+
+.profit-visual {
+    margin-top: 1.5rem;
+}
+
+.chart-wrapper {
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    height: 250px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Media queries para desktop */
+@media (min-width: 768px) {
+    .profit-details-modal {
+        max-width: 640px;
+    }
+    
+    .profit-details {
+        flex-direction: row;
+        gap: 1rem;
+    }
+    
+    .profit-section {
+        flex: 1;
+    }
+    
+    .chart-wrapper {
+        height: 300px;
+    }
+    
+    .calculation-line, .detail-item {
+        font-size: 1rem;
+    }
+    
+    .calculation-line.result {
+        font-size: 1.25rem;
+    }
+}
+
+.vat-analysis-modal {
+    max-width: 800px;
+}
+
+.month-selector-section,
+.vat-results-section {
+    margin-bottom: 2rem;
+}
+
+.selector-info {
+    color: #64748b;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.month-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.month-checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    background-color: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.month-checkbox-item:hover {
+    background-color: #f1f5f9;
+}
+
+.month-checkbox-item.selected {
+    background-color: #dbeafe;
+}
+
+.month-checkbox-item input {
+    margin-right: 0.75rem;
+}
+
+.selection-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+#selectedCount {
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.analyze-btn {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.analyze-btn:hover {
+    background-color: #2563eb;
+}
+
+.analyze-btn:disabled {
+    background-color: #cbd5e1;
+    cursor: not-allowed;
+}
+
+.vat-results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+}
+
+.vat-results-table th, 
+.vat-results-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.vat-results-table th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.vat-results-table .month-name {
+    font-weight: 500;
+}
+
+.vat-results-table .total-row {
+    font-weight: 700;
+    background-color: #f8fafc;
+}
+
+.back-to-selection-btn {
+    background-color: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: block;
+    margin: 1.5rem auto 0;
+}
+
+.back-to-selection-btn:hover {
+    background-color: #e2e8f0;
+    color: #1e293b;
+}
+
+.vat-chart-section {
+    margin-top: 2rem;
+}
+
+.employee-details-modal {
+  max-width: 900px;
+}
+
+.employee-results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+.employee-results-table th, 
+.employee-results-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.employee-results-table th {
+  background-color: #f8fafc;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.employee-results-table .total-row {
+  font-weight: 700;
+  background-color: #f8fafc;
+}
+
+.employee-chart-section {
+  margin-top: 2rem;
+}
+
+.employee-chart-section h3 {
+  font-size: 1rem;
+  color: #64748b;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
